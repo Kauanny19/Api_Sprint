@@ -3,26 +3,26 @@ const connect = require("../db/connect");
 // Verificar se o horário de início de um agendamento está dentro de um intervalo de tempo
 function isInTimeRange(timeStart, timeRange) {
   const [start, end] = timeRange.split(" - ");
-  const startTime = new Date(`1970-01-01T${start}`).getTime();
-  const endTime = new Date(`1970-01-01T${end}`).getTime();
+  const startTime = new Dia(`1970-01-01T${start}`).getTime();
+  const endTime = new Dia(`1970-01-01T${end}`).getTime();
   const scheduleTime = new Date(`1970-01-01T${timeStart}`).getTime();
   return scheduleTime >= startTime && scheduleTime < endTime;
 }
 
 module.exports = class scheduleController {
   static async createSchedule(req, res) {
-    const { dateStart, dateEnd, days, user, classroom, timeStart, timeEnd } =
+    const { dataInicio, dataFim, dias, usuario, salas, horarioInicio, horarioFim } =
       req.body;
     console.log(req.body);
     // Verificar se todos os campos estão preenchidos
     if (
-      !dateStart ||
-      !dateEnd ||
-      !days ||
-      !user ||
-      !classroom ||
-      !timeStart ||
-      !timeEnd
+      !dataInicio ||
+      !dataFim ||
+      !dias ||
+      !usuario ||
+      !salas ||
+      !horarioInicio ||
+      !horarioFim
     ) {
       return res
         .status(400)
@@ -30,7 +30,7 @@ module.exports = class scheduleController {
     }
 
     // Converter o array days em uma string separada por vírgulas
-    const daysString = days.map((day) => `${day}`).join(", ");
+    const daysString = days.map((dia) => `${dia}`).join(", ");
     console.log(daysString);
 
     // Verificar se o tempo está dentro do intervalo permitido
@@ -41,7 +41,7 @@ module.exports = class scheduleController {
     };
 
     // Verificar se o tempo de início e término está dentro do intervalo permitido
-    if (!isWithinTimeRange(timeStart) || !isWithinTimeRange(timeEnd)) {
+    if (!isWithinTimeRange(horarioInicio) || !isWithinTimeRange(horarioFim)) {
       return res.status(400).json({
         error:
           "A sala de aula só pode ser reservada dentro do intervalo de 7:30 às 23:00",
@@ -50,22 +50,22 @@ module.exports = class scheduleController {
 
     try {
       const overlapQuery = `
-    SELECT * FROM schedule
+    SELECT * FROM reserva
     WHERE 
-        classroom = '${classroom}'
+        salas = '${salas}'
         AND (
-            (dateStart <= '${dateEnd}' AND dateEnd >= '${dateStart}')
+            (dataInicio <= '${dataFim}' AND dataFim >= '${dataInicio}')
         )
         AND (
-            (timeStart <= '${timeEnd}' AND timeEnd >= '${timeStart}')
+            (dataInicio <= '${horarioFim}' AND horarioFim >= '${horarioInicio}')
         )
         AND (
-            (days LIKE '%Seg%' AND '${daysString}' LIKE '%Seg%') OR
-            (days LIKE '%Ter%' AND '${daysString}' LIKE '%Ter%') OR
-            (days LIKE '%Qua%' AND '${daysString}' LIKE '%Qua%') OR 
-            (days LIKE '%Qui%' AND '${daysString}' LIKE '%Qui%') OR
-            (days LIKE '%Sex%' AND '${daysString}' LIKE '%Sex%') OR
-            (days LIKE '%Sab%' AND '${daysString}' LIKE '%Sab%')
+            (dias LIKE '%Seg%' AND '${diasString}' LIKE '%Seg%') OR
+            (dias LIKE '%Ter%' AND '${diasString}' LIKE '%Ter%') OR
+            (dias LIKE '%Qua%' AND '${diasString}' LIKE '%Qua%') OR 
+            (dias LIKE '%Qui%' AND '${diasString}' LIKE '%Qui%') OR
+            (dias LIKE '%Sex%' AND '${diasString}' LIKE '%Sex%') OR
+            (dias LIKE '%Sab%' AND '${diasString}' LIKE '%Sab%')
         )`;
 
       connect.query(overlapQuery, function (err, results) {
@@ -86,15 +86,15 @@ module.exports = class scheduleController {
 
         // Caso contrário, prossegue com a inserção na tabela
         const insertQuery = `
-                INSERT INTO schedule (dateStart, dateEnd, days, user, classroom, timeStart, timeEnd)
+                INSERT INTO schedule (dataInicio, dataFim, dias, usuario, salas, horarioInicio, horarioFim)
                 VALUES (
-                    '${dateStart}',
-                    '${dateEnd}',
-                    '${daysString}',
-                    '${user}',
-                    '${classroom}',
-                    '${timeStart}',
-                    '${timeEnd}'
+                    '${dataInicio}',
+                    '${dataFim}',
+                    '${diasString}',
+                    '${usuario}',
+                    '${salas}',
+                    '${horarioInicio}',
+                    '${horarioFim}'
                 )
             `;
 
@@ -119,16 +119,16 @@ module.exports = class scheduleController {
   }
 
   static async getSchedulesByIdClassroomRanges(req, res) {
-    const classroomID = req.params.id;
+    const salasId = req.params.id;
     const { weekStart, weekEnd } = req.query; // Variavel para armazenar a semana selecionada
     console.log(weekStart+' '+weekEnd)
     // Consulta SQL para obter todos os agendamentos para uma determinada sala de aula
     const query = `
-    SELECT schedule.*, user.name AS userName
+    SELECT reserva.*, usuario.nome AS nomeUsuario
     FROM schedule
-    JOIN user ON schedule.user = user.cpf
-    WHERE classroom = '${classroomID}'
-    AND (dateStart <= '${weekEnd}' AND dateEnd >= '${weekStart}')
+    JOIN usuario ON reserva.usuario = usuario.cpf
+    WHERE salas = '${salasId}'
+    AND (dataInicio <= '${weekEnd}' AND dataFim >= '${weekStart}')
 `;
 
 
@@ -188,8 +188,8 @@ module.exports = class scheduleController {
         };
 
         // Organiza os agendamentos pelos dias da semana e intervalo de horário
-        results.forEach((schedule) => {
-          const days = schedule.days.split(", ");
+        results.forEach((reserva) => {
+          const dias = reserva.dias.split(", ");
           const timeRanges = [
             "07:30 - 09:30",
             "09:30 - 11:30",
@@ -197,19 +197,19 @@ module.exports = class scheduleController {
             "15:30 - 17:30",
             "19:00 - 22:00",
           ];
-          days.forEach((day) => {
+          dias.forEach((dia) => {
             timeRanges.forEach((timeRange) => {
               if (isInTimeRange(schedule.timeStart, timeRange)) {
-                schedulesByDayAndTimeRange[day][timeRange].push(schedule);
+                schedulesByDayAndTimeRange[dia][timeRange].push(reserva);
               }
             });
           });
         });
 
         // Ordena os agendamentos dentro de cada lista com base no timeStart
-        Object.keys(schedulesByDayAndTimeRange).forEach((day) => {
-          Object.keys(schedulesByDayAndTimeRange[day]).forEach((timeRange) => {
-            schedulesByDayAndTimeRange[day][timeRange].sort((a, b) => {
+        Object.keys(schedulesByDayAndTimeRange).forEach((dia) => {
+          Object.keys(schedulesByDayAndTimeRange[dia]).forEach((timeRange) => {
+            schedulesByDayAndTimeRange[dia][timeRange].sort((a, b) => {
               const timeStartA = new Date(`1970-01-01T${a.timeStart}`);
               const timeStartB = new Date(`1970-01-01T${b.timeStart}`);
               return timeStartA - timeStartB;
