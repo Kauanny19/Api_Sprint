@@ -8,25 +8,24 @@ const scheduleController = require("../controller/scheduleController");
 router.post("/user/", userController.createUser);
 router.post("/user/login", userController.postLogin);
 router.get("/user/", userController.getAllUsers);
-router.get("/user/:id", userController.getUserById);
+// router.get("/user/:id", userController.getUserById);
 router.put("/user/:id", userController.updateUser);
 router.delete("/user/:id", userController.deleteUser);
 
 //Classroom
 router.post("/classroom/", classroomController.createClassroom);
-router.get("/classroom/", classroomController.getAllClassrooms);
-router.get("/classroom/:number", classroomController.getClassroomById);
-router.put("/classroom/", classroomController.updateClassroom);
-router.delete("/classroom/:number", classroomController.deleteClassroom);
+// router.get("/classroom/", classroomController.getAllClassrooms);
+// router.get("/classroom/:number", classroomController.getClassroomById);
+// router.put("/classroom/", classroomController.updateClassroom);
+// router.delete("/classroom/:number", classroomController.deleteClassroom);
 
 //Schedule
 router.post("/schedule/", scheduleController.createSchedule);
 router.get("/schedule/", scheduleController.getAllSchedules);
 router.get("/schedule/:id", scheduleController.getSchedulesByIdClassroom);
-router.get(
-  "/schedule/ranges/:id",
-  scheduleController.getSchedulesByIdClassroomRanges
-);
+router.get("/schedule/ranges/:id", scheduleController.getSchedulesByIdClassroomRanges);
 router.delete("/schedule/:id", scheduleController.deleteSchedule);
+
+// http://10.89.240.95:5000/api/reservas/v1
 
 module.exports = router;
