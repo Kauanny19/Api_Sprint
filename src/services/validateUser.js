@@ -1,10 +1,10 @@
 module.exports = function validateUser({
     cpf,
     email,
-    password,
-    name,
+    senha,
+    nome,
   }) {
-    if (!cpf || !email || !password || !name) {
+    if (!cpf || !email || !senha || !nome) {
       return { error: "Todos os campos devem ser preenchidos" };
     }
   
