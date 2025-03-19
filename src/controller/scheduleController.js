@@ -1,37 +1,25 @@
 const connect = require("../db/connect");
 
 // Verificar se o horário de início de um agendamento está dentro de um intervalo de tempo
-function isInTimeRange(timeStart, timeRange) {
+function isInTimeRange(horarioInicio, timeRange) {
   const [start, end] = timeRange.split(" - ");
-  const startTime = new Dia(`1970-01-01T${start}`).getTime();
-  const endTime = new Dia(`1970-01-01T${end}`).getTime();
-  const scheduleTime = new Date(`1970-01-01T${timeStart}`).getTime();
-  return scheduleTime >= startTime && scheduleTime < endTime;
+  const horarioInicio = new Dia(`1970-01-01T${start}`).getTime();
+  const horarioFim = new Dia(`1970-01-01T${end}`).getTime();
+  const reservaTime = new Date(`1970-01-01T${horarioInicio}`).getTime();
+  return reservaTime >= horarioInicio && reservaTime < horarioFim;
 }
 
 module.exports = class scheduleController {
   static async createSchedule(req, res) {
-    const { dataInicio, dataFim, dias, usuario, salas, horarioInicio, horarioFim } =
+    const { dataInicio, dataFim, days, usuario, salas, horarioInicio, horarioFim } =
       req.body;
     console.log(req.body);
-    // Verificar se todos os campos estão preenchidos
-    if (
-      !dataInicio ||
-      !dataFim ||
-      !dias ||
-      !usuario ||
-      !salas ||
-      !horarioInicio ||
-      !horarioFim
-    ) {
-      return res
-        .status(400)
-        .json({ error: "Todos os campos devem ser preenchidos" });
-    }
+
+    
 
     // Converter o array days em uma string separada por vírgulas
-    const daysString = days.map((dia) => `${dia}`).join(", ");
-    console.log(daysString);
+    const diasString = days.map((dia) => `${dia}`).join(", ");
+    console.log(diasString);
 
     // Verificar se o tempo está dentro do intervalo permitido
     const isWithinTimeRange = (time) => {
@@ -357,3 +345,4 @@ module.exports = class scheduleController {
     }
   }
 };
+//day
