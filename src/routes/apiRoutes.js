@@ -9,7 +9,7 @@ router.post("/user/", userController.createUser);
 router.post("/user/login", userController.postLogin);
 router.get("/user/", userController.getAllUsers);
 router.get("/user/:id", userController.getUserById);
-router.put("/user/:id", userController.updateUser);
+router.put("/user", userController.updateUser);
 router.delete("/user/:id", userController.deleteUser);
 
 //Classroom
