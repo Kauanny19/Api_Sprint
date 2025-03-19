@@ -4,7 +4,7 @@ const validateCpf = require("../services/validateCpf");
 
 module.exports = class userController {
   static async createUser(req, res) {
-    const { cpf, email, password, name, data_nascimento } = req.body;
+    const { cpf, email, senha, nome } = req.body;
 
     const validationError = validateUser(req.body);
     if (validationError) {
@@ -16,10 +16,10 @@ module.exports = class userController {
       if (cpfError) {
         return res.status(400).json(cpfError);
       }
-      const query = `INSERT INTO usuario (cpf, password, email, name, data_nascimento) VALUES (?, ?, ?, ?, ?)`;
+      const query = `INSERT INTO usuario (cpf, senha, email, nome) VALUES (?, ?, ?, ?)`;
       connect.query(
         query,
-        [cpf, password, email, name, data_nascimento],
+        [cpf, senha, email, nome],
         (err) => {
           if (err) {
             if (err.code === "ER_DUP_ENTRY") {
@@ -62,7 +62,7 @@ module.exports = class userController {
     }
   }
   static async updateUser(req, res) {
-    const { cpf, email, password, name, data_nascimento, id } = req.body;
+    const { cpf, email, senha, nome, id } = req.body;
 
     const validationError = validateUser(req.body);
     if (validationError) {
@@ -75,10 +75,10 @@ module.exports = class userController {
         return res.status(400).json(cpfError);
       }
       const query =
-        "UPDATE usuario SET cpf = ?, email = ?, password = ?, name = ? , data_nascimento=? WHERE id_usuario = ?";
+        "UPDATE usuario SET cpf = ?, email = ?, senha = ?, nome = ?  WHERE id_usuario = ?";
       connect.query(
         query,
-        [cpf, email, password, name, data_nascimento, id],
+        [cpf, email, senha, nome, id],
         (err, results) => {
           if (err) {
             if (err.code === "ER_DUP_ENTRY") {
@@ -130,14 +130,14 @@ module.exports = class userController {
   }
 
   // Método de Login - Implementar
-  static async loginUser(req, res) {
-    const { email, password } = req.body;
+  static async postLogin(req, res) {
+    const { email, senha } = req.body;
 
-    if (!email || !password) {
+    if (!email || !senha) {
       return res.status(400).json({ error: "Email e senha são obrigatórios" });
     }
 
-    const query = `SELECT * FROM usuario WHERE email = '${email}' AND password = '${password}'`;
+    const query = `SELECT * FROM usuario WHERE email = '${email}' AND senha = '${senha}'`;
 
     try {
       connect.query(query, [email], (err, results) => {
@@ -152,7 +152,7 @@ module.exports = class userController {
 
         const user = results[0];
 
-        if (user.password !== password) {
+        if (user.senha !== senha) {
           return res.status(401).json({ error: "Senha incorreta" });
         }
 
