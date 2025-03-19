@@ -11,7 +11,7 @@ module.exports = class classroomController {
     }
 
     // Caso todos os campos estejam preenchidos, realiza a inserção na tabela
-    const query = `INSERT INTO classroom (numero, descricao, capacidade) VALUES ( 
+    const query = `INSERT INTO sala (numero, descricao, capacidade) VALUES ( 
         '${numero}', 
         '${descricao}', 
         '${capacidade}'
@@ -33,9 +33,9 @@ module.exports = class classroomController {
     }
   }
 
-  static async getAllSalas(req, res) {
+  static async getAllClassrooms(req, res) {
     try {
-      const query = "SELECT * FROM salas";
+      const query = "SELECT * FROM sala";
       connect.query(query, function (err, result) {
         if (err) {
           console.error("Erro ao obter salas:", err);
@@ -50,11 +50,11 @@ module.exports = class classroomController {
     }
   }
 
-  static async getSalasById(req, res) {
+  static async getClassroomById(req, res) {
     const salasId = req.params.numero;
 
     try {
-      const query = `SELECT * FROM salas WHERE numero = '${salasId}'`;
+      const query = `SELECT * FROM sala WHERE numero = '${salasId}'`;
       connect.query(query, function (err, result) {
         if (err) {
           console.error("Erro ao obter sala:", err);
@@ -77,7 +77,7 @@ module.exports = class classroomController {
     }
   }
 
-  static async updateSalas(req, res) {
+  static async updateClassroom(req, res) {
     const { numero, descricao, capacidade } = req.body;
 
     // Validar campos obrigatórios
@@ -128,7 +128,7 @@ module.exports = class classroomController {
     }
   }
 
-  static async deleteSalas(req, res) {
+  static async deleteClassroom(req, res) {
     const salasId = req.params.mumero;
     try {
       // Verificar se há reservas associadas à sala

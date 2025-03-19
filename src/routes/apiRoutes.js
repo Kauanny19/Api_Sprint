@@ -8,16 +8,16 @@ const scheduleController = require("../controller/scheduleController");
 router.post("/user/", userController.createUser);
 router.post("/user/login", userController.postLogin);
 router.get("/user/", userController.getAllUsers);
-// router.get("/user/:id", userController.getUserById);
+router.get("/user/:id", userController.getUserById);
 router.put("/user/:id", userController.updateUser);
 router.delete("/user/:id", userController.deleteUser);
 
 //Classroom
 router.post("/classroom/", classroomController.createClassroom);
-// router.get("/classroom/", classroomController.getAllClassrooms);
-// router.get("/classroom/:number", classroomController.getClassroomById);
-// router.put("/classroom/", classroomController.updateClassroom);
-// router.delete("/classroom/:number", classroomController.deleteClassroom);
+router.get("/classroom/", classroomController.getAllClassrooms);
+router.get("/classroom/:number", classroomController.getClassroomById);
+router.put("/classroom/", classroomController.updateClassroom);
+router.delete("/classroom/:number", classroomController.deleteClassroom);
 
 //Schedule
 router.post("/schedule/", scheduleController.createSchedule);
