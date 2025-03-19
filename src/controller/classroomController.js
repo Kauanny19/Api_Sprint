@@ -86,7 +86,7 @@ module.exports = class classroomController {
 
     try {
       // Verificar se a sala existe
-      const findQuery = `SELECT * FROM salas WHERE numero = ?`;
+      const findQuery = `SELECT * FROM sala WHERE numero = ?`;
       connect.query(findQuery, [numero], function (err, result) {
         if (err) {
           console.error("Erro ao buscar a sala:", err);
@@ -129,18 +129,18 @@ module.exports = class classroomController {
     const salaId = req.params.numero;
     try {
       // Verificar se há reservas associadas à sala
-      const checkReservationsQuery = `SELECT * FROM reserva WHERE sala = ?`;
+      const checkReservasQuery = `SELECT * FROM reserva WHERE idSala = ?`;
       connect.query(
-        checkReservationsQuery,
+        checkReservasQuery,
         [salaId],
-        function (err, reservations) {
+        function (err, reservas) {
           if (err) {
             console.error("Erro ao verificar reservas:", err);
             return res.status(500).json({ error: "Erro interno do servidor" });
           }
 
           // Verificar se existem reservas associadas
-          if (reservations.length > 0) {
+          if (reservas.length > 0) {
             // Impedir exclusão e retornar erro
             return res
               .status(400)
@@ -151,7 +151,7 @@ module.exports = class classroomController {
           } else {
             // Deletar a sala de aula
             const deleteQuery = `DELETE FROM sala WHERE numero = ?`;
-            connect.query(deleteQuery, [salaId], function (err, result) {
+            connect.query(deleteQuery, [salaId], function (err, results) {
               if (err) {
                 console.error("Erro ao deletar a sala:", err);
                 return res
@@ -159,7 +159,7 @@ module.exports = class classroomController {
                   .json({ error: "Erro ao deletar a sala" });
               }
 
-              if (result.affectedRows === 0) {
+              if (results.affectedRows === 0) {
                 return res.status(404).json({ error: "Sala não encontrada" });
               }
 
