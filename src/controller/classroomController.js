@@ -66,7 +66,7 @@ module.exports = class classroomController {
 
         console.log("Sala obtida com sucesso");
         res.status(200).json({
-          message: "Obtendo a sala com ID: " + salaId,
+          message: "Obtendo a sala com o número: " + salaId,
           salas: result[0],
         });
       });

@@ -80,7 +80,7 @@ module.exports = class userController {
         return res
           .status(200)
           .json({
-            message: "Obtendo usuário com ID: " + userId,
+            message: "Obtendo usuário com CPF: " + userId,
             user: results[0],
           });
       });
