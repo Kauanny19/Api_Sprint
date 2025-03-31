@@ -158,7 +158,7 @@ module.exports = class userController {
     }
   }
 
-  // Método de Login - Implementar
+  // Método de Login
   static async postLogin(req, res) {
     const { email, senha } = req.body;
 
