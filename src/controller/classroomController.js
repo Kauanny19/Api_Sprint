@@ -1,4 +1,6 @@
 const connect = require("../db/connect");
+const validateClassroom = require("../services/validateClassroom");
+
 module.exports = class classroomController {
   static async createClassroom(req, res) {
     const { numero, descricao, capacidade } = req.body;
@@ -77,11 +79,9 @@ module.exports = class classroomController {
   static async updateClassroom(req, res) {
     const { numero, descricao, capacidade } = req.body;
 
-    // Validar campos obrigatórios
-    if (!numero || !descricao || !capacidade) {
-      return res
-        .status(400)
-        .json({ error: "Todos os campos devem ser preenchidos" });
+    const validationError = validateClassroom(req.body);
+    if (validationError) {
+      return res.status(400).json(validationError);
     }
 
     try {
@@ -126,10 +126,11 @@ module.exports = class classroomController {
   }
 
   static async deleteClassroom(req, res) {
-    const salaId = req.params.numero;
+    const salaId = req.params.numero; // Usando 'numero' como parâmetro
+
     try {
       // Verificar se há reservas associadas à sala
-      const checkReservasQuery = `SELECT * FROM reserva WHERE idSala = ?`;
+      const checkReservasQuery = `SELECT * FROM reserva WHERE fk_id_sala = ?`; // Usando 'fk_id_sala'
       connect.query(
         checkReservasQuery,
         [salaId],

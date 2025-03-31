@@ -2,7 +2,7 @@ const router = require("express").Router();
 
 const userController = require("../controller/userController");
 const classroomController = require("../controller/classroomController");
-const scheduleController = require("../controller/scheduleController");
+const controllerReserva = require("../controller/controllerReserva");
 
 //User
 router.post("/user/", userController.createUser);
@@ -13,18 +13,17 @@ router.put("/user", userController.updateUser);
 router.delete("/user/:id", userController.deleteUser);
 
 //Classroom
-router.post("/classroom/", classroomController.createClassroom);
-router.get("/classroom/", classroomController.getAllClassrooms);
-router.get("/classroom/:number", classroomController.getClassroomById);
-router.put("/classroom/", classroomController.updateClassroom);
-router.delete("/classroom/:number", classroomController.deleteClassroom);
+router.post("/sala/", classroomController.createClassroom);
+router.get("/sala/", classroomController.getAllClassrooms);
+router.get("/sala/:numero", classroomController.getClassroomById);
+router.put("/sala/", classroomController.updateClassroom);
+router.delete("/sala/:numero", classroomController.deleteClassroom);
 
 //Schedule
-router.post("/schedule/", scheduleController.createSchedule);
-router.get("/schedule/", scheduleController.getAllSchedules);
-router.get("/schedule/:id", scheduleController.getSchedulesByIdClassroom);
-router.get("/schedule/ranges/:id", scheduleController.getSchedulesByIdClassroomRanges);
-router.delete("/schedule/:id", scheduleController.deleteSchedule);
+router.post("/reserva/", controllerReserva.createReserva);
+router.get("/reserva/", controllerReserva.getReservas);
+router.put("/reserva/:id", controllerReserva.updateReserva);
+router.delete("/reserva/:id_reserva", controllerReserva.deleteReserva);
 
 // http://10.89.240.95:5000/api/reservas/v1
 

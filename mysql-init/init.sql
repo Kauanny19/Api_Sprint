@@ -25,15 +25,13 @@ DROP TABLE IF EXISTS `reserva`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `reserva` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id_reserva` int NOT NULL AUTO_INCREMENT,
   `fk_id_sala` int NOT NULL,
   `fk_id_usuario` int NOT NULL,
-  `dataInicio` date NOT NULL,
-  `dataFim` date NOT NULL,
-  `dias` varchar(255) NOT NULL,
+  `data` date NOT NULL,
   `horarioInicio` time NOT NULL,
   `horarioFim` time NOT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id_reserva`),
   KEY `fk_id_sala` (`fk_id_sala`),
   KEY `fk_id_usuario` (`fk_id_usuario`),
   CONSTRAINT `reserva_ibfk_1` FOREIGN KEY (`fk_id_sala`) REFERENCES `sala` (`id_sala`),
