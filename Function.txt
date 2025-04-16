@@ -1,0 +1,48 @@
+DELIMITER //
+
+CREATE PROCEDURE sp_delete_reserva(
+    IN p_id_reserva INT
+)
+BEGIN
+    DECLARE reserva_exists INT;
+    
+    -- Verificar se a reserva existe
+    SELECT COUNT(*) INTO reserva_exists 
+    FROM reserva 
+    WHERE id_reserva = p_id_reserva;
+    
+    -- Se a reserva existir, excluir
+    IF reserva_exists > 0 THEN
+        DELETE FROM reserva WHERE id_reserva = p_id_reserva;
+        SELECT 'Reserva excluída com sucesso' AS message;
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Reserva não encontrada';
+    END IF;
+END //
+
+DELIMITER ;
+
+
+===============================================================
+
+static async deleteReserva(req, res) {
+  const reservaId = req.params.id_reserva;
+  
+  try {
+    const query = `CALL sp_delete_reserva(?)`;
+    const results = await queryAsync(query, [reservaId]);
+    
+    // A procedure retorna um conjunto de resultados
+    return res.status(200).json({ message: results[0][0].message });
+  } catch (error) {
+    console.error(error);
+    
+    // Se for o erro específico da procedure (reserva não encontrada)
+    if (error.sqlState === '45000') {
+      return res.status(404).json({ error: error.message });
+    }
+    
+    return res.status(500).json({ error: "Erro interno no servidor" });
+  }
+}

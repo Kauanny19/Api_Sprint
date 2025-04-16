@@ -43,6 +43,8 @@ module.exports = class ControllerReserva {
         return res.status(400).json(conflito);
       }
 
+      // const query = ''
+
       // Inserir reserva no banco
       const query = `
         INSERT INTO reserva (fk_id_usuario, fk_id_sala, data, horarioInicio, horarioFim)
@@ -173,7 +175,6 @@ module.exports = class ControllerReserva {
   }
   
 };
-
 
 
 // Função para formatar reserva no fuso horário correto (UTC-3)
