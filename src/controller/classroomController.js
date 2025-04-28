@@ -1,6 +1,16 @@
 const connect = require("../db/connect");
 const validateClassroom = require("../services/validateClassroom");
 
+// Função para facilitar a execução de queries assíncronas
+const queryAsync = (query, values) => {
+  return new Promise((resolve, reject) => {
+    connect.query(query, values, (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
+};
+
 module.exports = class classroomController {
   static async createClassroom(req, res) {
     const { numero, descricao, capacidade } = req.body;
@@ -176,3 +186,4 @@ module.exports = class classroomController {
     }
   }
 };
+

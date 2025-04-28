@@ -1,48 +1,73 @@
 DELIMITER //
 
-CREATE PROCEDURE sp_delete_reserva(
-    IN p_id_reserva INT
+CREATE PROCEDURE sp_get_sala_reservada(
+  IN p_id_sala INT,
+  IN p_data DATE
 )
 BEGIN
-    DECLARE reserva_exists INT;
+  -- Declare variables for business hours (can be adjusted as needed)
+  DECLARE v_start_time TIME DEFAULT '08:00:00';
+  DECLARE v_end_time TIME DEFAULT '18:00:00';
+  DECLARE v_sala_duration INT DEFAULT 30; -- Duration in minutes
+  
+  -- Temporary table to store all possible time salas
+  DROP TEMPORARY TABLE IF EXISTS temp_all_salas;
+  CREATE TEMPORARY TABLE temp_all_salas (
+    sala_start TIME,
+    sala_end TIME
+  );
+  
+  -- Populate temporary table with all possible time salas
+  SET @current_time = v_start_time;
+  
+  WHILE @current_time < v_end_time DO
+    INSERT INTO temp_all_salas (sala_start, sala_end)
+    VALUES (
+      @current_time, 
+      ADDTIME(@current_time, SEC_TO_TIME(v_sala_duration * 60))
+    );
     
-    -- Verificar se a reserva existe
-    SELECT COUNT(*) INTO reserva_exists 
-    FROM reserva 
-    WHERE id_reserva = p_id_reserva;
-    
-    -- Se a reserva existir, excluir
-    IF reserva_exists > 0 THEN
-        DELETE FROM reserva WHERE id_reserva = p_id_reserva;
-        SELECT 'Reserva excluída com sucesso' AS message;
-    ELSE
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Reserva não encontrada';
-    END IF;
+    SET @current_time = ADDTIME(@current_time, SEC_TO_TIME(v_sala_duration * 60));
+  END WHILE;
+  
+  -- First result set: Reserved time salas for the room
+  SELECT 
+    r.id_reserva,
+    u.nome AS nomeUsuario,
+    r.horarioInicio,
+    r.horarioFim
+  FROM 
+    reserva r
+    INNER JOIN usuario u ON r.fk_id_usuario = u.id_usuario
+  WHERE 
+    r.fk_id_sala = p_id_sala AND 
+    r.data = p_data
+  ORDER BY 
+    r.horarioInicio;
+  
+  -- Second result set: Available time salas
+  SELECT 
+    t.sala_start AS horarioInicio,
+    t.sala_end AS horarioFim
+  FROM 
+    temp_all_salas t
+  WHERE 
+    NOT EXISTS (
+      SELECT 1 
+      FROM reserva r 
+      WHERE 
+        r.fk_id_sala = p_id_sala AND 
+        r.data = p_data AND (
+          (r.horarioInicio < t.sala_end AND r.horarioFim > t.sala_start) OR
+          (r.horarioInicio = t.sala_start) OR
+          (r.horarioFim = t.sala_end)
+        )
+    )
+  ORDER BY 
+    t.sala_start;
+  
+  -- Clean up
+  DROP TEMPORARY TABLE IF EXISTS temp_all_salas;
 END //
 
 DELIMITER ;
-
-
-===============================================================
-
-static async deleteReserva(req, res) {
-  const reservaId = req.params.id_reserva;
-  
-  try {
-    const query = `CALL sp_delete_reserva(?)`;
-    const results = await queryAsync(query, [reservaId]);
-    
-    // A procedure retorna um conjunto de resultados
-    return res.status(200).json({ message: results[0][0].message });
-  } catch (error) {
-    console.error(error);
-    
-    // Se for o erro específico da procedure (reserva não encontrada)
-    if (error.sqlState === '45000') {
-      return res.status(404).json({ error: error.message });
-    }
-    
-    return res.status(500).json({ error: "Erro interno no servidor" });
-  }
-}

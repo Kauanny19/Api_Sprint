@@ -1,10 +1,10 @@
 CREATE DATABASE  IF NOT EXISTS `senai` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `senai`;
--- MySQL dump 10.13  Distrib 8.0.41, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
 -- Host: localhost    Database: senai
 -- ------------------------------------------------------
--- Server version	8.0.41
+-- Server version	8.0.36
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -36,7 +36,7 @@ CREATE TABLE `reserva` (
   KEY `fk_id_usuario` (`fk_id_usuario`),
   CONSTRAINT `reserva_ibfk_1` FOREIGN KEY (`fk_id_sala`) REFERENCES `sala` (`id_sala`),
   CONSTRAINT `reserva_ibfk_2` FOREIGN KEY (`fk_id_usuario`) REFERENCES `usuario` (`id_usuario`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,6 +45,7 @@ CREATE TABLE `reserva` (
 
 LOCK TABLES `reserva` WRITE;
 /*!40000 ALTER TABLE `reserva` DISABLE KEYS */;
+INSERT INTO `reserva` VALUES (1,1,1,'2025-04-29','10:00:00','11:00:00'),(2,1,1,'2025-04-28','14:00:00','15:00:00'),(3,10,1,'2025-04-28','14:00:00','15:00:00'),(4,2,1,'2025-04-29','09:00:00','10:00:00'),(5,3,1,'2025-04-29','16:00:00','17:00:00');
 /*!40000 ALTER TABLE `reserva` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -91,7 +92,7 @@ CREATE TABLE `usuario` (
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `cpf` (`cpf`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -100,6 +101,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
+INSERT INTO `usuario` VALUES (1,'jao','@','11111111111','123'),(3,'gaby','@2','11111111112','123');
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -110,6 +112,90 @@ UNLOCK TABLES;
 --
 -- Dumping routines for database 'senai'
 --
+/*!50003 DROP PROCEDURE IF EXISTS `sp_get_sala_reservada` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`alunods`@`%` PROCEDURE `sp_get_sala_reservada`(
+  IN p_id_sala INT,
+  IN p_data DATE
+)
+BEGIN
+  -- Declare variables for business hours (can be adjusted as needed)
+  DECLARE v_start_time TIME DEFAULT '08:00:00';
+  DECLARE v_end_time TIME DEFAULT '18:00:00';
+  DECLARE v_sala_duration INT DEFAULT 30; -- Duration in minutes
+  
+  -- Temporary table to store all possible time salas
+  DROP TEMPORARY TABLE IF EXISTS temp_all_salas;
+  CREATE TEMPORARY TABLE temp_all_salas (
+    sala_start TIME,
+    sala_end TIME
+  );
+  
+  -- Populate temporary table with all possible time salas
+  SET @current_time = v_start_time;
+  
+  WHILE @current_time < v_end_time DO
+    INSERT INTO temp_all_salas (sala_start, sala_end)
+    VALUES (
+      @current_time,
+      ADDTIME(@current_time, SEC_TO_TIME(v_sala_duration * 60))
+    );
+    
+    SET @current_time = ADDTIME(@current_time, SEC_TO_TIME(v_sala_duration * 60));
+  END WHILE;
+  
+  -- First result set: Reserved time salas for the room
+  SELECT
+    r.id_reserva,
+    u.nome AS nomeUsuario,
+    r.horarioInicio,
+    r.horarioFim
+  FROM
+    reserva r
+    INNER JOIN usuario u ON r.fk_id_usuario = u.id_usuario
+  WHERE
+    r.fk_id_sala = p_id_sala AND
+    r.data = p_data
+  ORDER BY
+    r.horarioInicio;
+  
+  -- Second result set: Available time salas
+  SELECT
+    t.sala_start AS horarioInicio,
+    t.sala_end AS horarioFim
+  FROM
+    temp_all_salas t
+  WHERE
+    NOT EXISTS (
+      SELECT 1
+      FROM reserva r
+      WHERE
+        r.fk_id_sala = p_id_sala AND
+        r.data = p_data AND (
+          (r.horarioInicio < t.sala_end AND r.horarioFim > t.sala_start) OR
+          (r.horarioInicio = t.sala_start) OR
+          (r.horarioFim = t.sala_end)
+        )
+    )
+  ORDER BY
+    t.sala_start;
+  
+  -- Clean up
+  DROP TEMPORARY TABLE IF EXISTS temp_all_salas;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -120,4 +206,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-18 18:15:01
+-- Dump completed on 2025-04-28 14:23:57

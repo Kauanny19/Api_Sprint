@@ -1,0 +1,82 @@
+
+
+
+static async getAvailableRooms(req, res) {
+    const { data, horarioInicio, horarioFim } = req.body;
+    
+    // Validação dos parâmetros
+    if (!data || !horarioInicio || !horarioFim) {
+      return res.status(400).json({ 
+        error: "Parâmetros incompletos. Informe data, horarioInicio e horarioFim" 
+      });
+    }
+  
+    // Validação de formato da data (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(data)) {
+      return res.status(400).json({ 
+        error: "Formato de data inválido. Use o formato YYYY-MM-DD" 
+      });
+    }
+  
+    // Validação de formato de horário (HH:MM:SS)
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+    if (!timeRegex.test(horarioInicio) || !timeRegex.test(horarioFim)) {
+      return res.status(400).json({ 
+        error: "Formato de horário inválido. Use o formato HH:MM:SS" 
+      });
+    }
+  
+    // Validação de lógica de horários
+    if (horarioInicio >= horarioFim) {
+      return res.status(400).json({ 
+        error: "O horário de início deve ser anterior ao horário de fim" 
+      });
+    }
+  
+    try {
+      // Chamar a stored procedure para obter salas disponíveis
+      const query = `CALL sp_get_available_rooms(?, ?, ?)`;
+      
+      const results = await queryAsync(query, [data, horarioInicio, horarioFim]);
+      
+      // A stored procedure retorna um array de resultados, o primeiro item contém as salas disponíveis
+      const salasDisponiveis = results[0];
+      
+      return res.status(200).json({ 
+        message: "Salas disponíveis encontradas",
+        data: data,
+        horarioInicio: horarioInicio,
+        horarioFim: horarioFim, 
+        salas: salasDisponiveis 
+      });
+    } catch (error) {
+      console.error("Erro ao buscar salas disponíveis:", error);
+      return res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  }
+
+
+
+
+
+
+
+
+
+// Função para formatar reserva no fuso horário correto (UTC-3)
+function reservaFormat(reserva) {
+  if (reserva.data instanceof Date) {
+    reserva.data = reserva.data.toISOString().split("T")[0];
+  }
+
+  if (reserva.horarioInicio instanceof Date) {
+    reserva.horarioInicio = reserva.horarioInicio.toISOString().split("T")[1].split(".")[0];
+  }
+
+  if (reserva.horarioFim instanceof Date) {
+    reserva.horarioFim = reserva.horarioFim.toISOString().split("T")[1].split(".")[0];
+  }
+
+  return reserva;
+}

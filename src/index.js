@@ -17,7 +17,7 @@ class AppController {
 
     routes() {
       const apiRoutes= require('./routes/apiRoutes');
-      this.express.use('/api/reservas/v1/', apiRoutes);
+      this.express.use('/api', apiRoutes);
     }
   }
 

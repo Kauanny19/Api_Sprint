@@ -173,11 +173,57 @@ module.exports = class ControllerReserva {
       return res.status(500).json({ error: "Erro interno no servidor" });
     }
   }
+
+  static async viewReservaSala(req, res) {
+    const { id_sala, data } = req.body;
+    console.log("Dados recebidos:", { id_sala, data });
+    
+    // Validate parameters
+    if (!id_sala || !data) {
+      return res.status(400).json({ 
+        error: "Parâmetros incompletos. Informe id_sala e data" 
+      });
+    }
+  
+    // Validate date format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(data)) {
+      return res.status(400).json({ 
+        error: "Formato de data inválido. Use o formato YYYY-MM-DD" 
+      });
+    }
+  
+    try {
+      const query = `CALL sp_get_sala_reservada(?, ?)`;
+      console.log("Executando query:", query);
+      console.log("Parâmetros:", [id_sala, data]);
+      
+      const results = await queryAsync(query, [id_sala, data]);
+      console.log("Resultados obtidos:", results);
+      
+      const salareservada = results[0];
+      const salasemreserva = results[1];
+      
+      return res.status(200).json({ 
+        message: "Agenda da sala recuperada com sucesso",
+        sala_id: id_sala,
+        data: data,
+        horarios_reservados: salareservada.map(sala => ({
+          id_reserva: sala.id_reserva,
+          usuario: sala.nomeUsuario,
+          inicio: sala.horarioInicio,
+          fim: sala.horarioFim
+        })),
+        horarios_disponiveis: salasemreserva
+      });
+    } catch (error) {
+      console.error("Erro ao buscar agenda da sala:", error);
+      return res.status(500).json({ error: "Erro interno do servidor", detalhes: error.message });
+    }
+  }
   
 };
 
-
-// Função para formatar reserva no fuso horário correto (UTC-3)
 function reservaFormat(reserva) {
   if (reserva.data instanceof Date) {
     reserva.data = reserva.data.toISOString().split("T")[0];
@@ -193,3 +239,4 @@ function reservaFormat(reserva) {
 
   return reserva;
 }
+
