@@ -24,9 +24,7 @@ router.post("/reserva/", controllerReserva.createReserva);
 router.get("/reserva/", controllerReserva.getReservas);
 router.put("/reserva/:id", controllerReserva.updateReserva);
 router.delete("/reserva/:id_reserva", controllerReserva.deleteReserva);
-
-// Nova rota para verificar a agenda de uma sala específica
-router.post("/sala/agenda", controllerReserva.viewReservaSala);
+router.get("/reserva/horarios/:id_sala/:data", controllerReserva.getHorariosSala);
 
 // http://10.89.240.73:3000/api/
 
