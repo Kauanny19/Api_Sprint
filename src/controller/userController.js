@@ -1,6 +1,7 @@
 const connect = require("../db/connect");
 const validateUser = require("../services/validateUser");
 const validateCpf = require("../services/validateCpf");
+const jwt = require("jsonwebtoken");
 
 module.exports = class userController {
   static async createUser(req, res) {
@@ -89,9 +90,16 @@ module.exports = class userController {
       return res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
-  
+
   static async updateUser(req, res) {
     const { cpf, email, senha, nome, id } = req.body;
+    const userId = id;
+    const VerificarToken = userId;
+
+    // Aqui você precisa ter certeza que `req.user.id` existe, ou adaptar conforme seu token
+    if (VerificarToken !== req.userId) {
+      return res.status(403).json({ error: "Usuário não autorizado a atualizar este perfil" });
+    }
 
     const validationError = validateUser(req.body);
     if (validationError) {
@@ -134,6 +142,13 @@ module.exports = class userController {
   }
   static async deleteUser(req, res) {
     const userId = req.params.id;
+    const usuarioId = req.userId; // ID do usuário autenticado (via token)
+
+    // Verifica se o usuário autenticado está tentando deletar outro usuário
+    if (Number(userId) !== Number(usuarioId)) {
+      return res.status(403).json({ error: "Usuário não autorizado a deletar este perfil" });
+    }
+
     const query = `DELETE FROM usuario WHERE id_usuario = ?`;
     const values = [userId];
 
@@ -185,7 +200,19 @@ module.exports = class userController {
           return res.status(401).json({ error: "Senha incorreta" });
         }
 
-        return res.status(200).json({ message: "Login bem-sucedido", user });
+        const token = jwt.sign({ id: user.id_usuario }, process.env.SECRET, {
+          expiresIn: "1h",
+        });
+
+        // Remove um atributo de um obj 
+        delete user.password;
+
+        return res.status(200).json({
+          message: "Login bem-sucedido",
+          user,
+          token
+        })
+
       });
     } catch (error) {
       console.error("Erro ao executar a consulta:", error);
