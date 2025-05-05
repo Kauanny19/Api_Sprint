@@ -9,18 +9,7 @@ id and date
 
 Email and password
 
-
-Criação de reserva
-{ 
-    "id_usuario": 1, 
-    "fk_id_sala": 1, 
-    "data":"2025-05-05", 
-    "horarioInicio":"20:00:00", 
-    "horarioFim":"21:00:00" 
-}
-
 ------------------------------------------------------------------------------
-
 Validar LOGIN
 
 DELIMITER //
@@ -42,3 +31,5 @@ BEGIN
     END IF;
 END //
 DELIMITER ;
+
+---------------------------------------------------------------------------

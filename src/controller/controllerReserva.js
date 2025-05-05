@@ -191,7 +191,7 @@ static async getHorariosSala(req, res) {
 
   // Extrai os parâmetros 'id_sala' e 'data' da URL (ex: /salas/:id_sala/:data)
   const { id_sala, data } = req.params;
-
+console.log(id_sala,data)
   // Verifica se ambos os parâmetros obrigatórios foram fornecidos
   if (!id_sala || !data) {
     // Se não, retorna erro 400 (requisição inválida)
@@ -216,10 +216,10 @@ static async getHorariosSala(req, res) {
     }));
 
     // Define o horário de funcionamento da sala (das 07h às 23h)
-    const horarioAbertura = 7;     // Início do expediente
-    const horarioFechamento = 23;  // Fim do expediente
-    const intervaloHoras = 1;      // Duração de cada faixa horária (1 hora)
-    let disponiveis = [];          // Lista que armazenará os horários disponíveis
+    const horarioAbertura = 7;     
+    const horarioFechamento = 23;  
+    const intervaloHoras = 1;      
+    let disponiveis = [];          
 
     // Gera os horários possíveis dentro do expediente
     for (let h = horarioAbertura; h < horarioFechamento; h += intervaloHoras) {

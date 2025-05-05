@@ -36,7 +36,7 @@ CREATE TABLE `reserva` (
   KEY `fk_id_usuario` (`fk_id_usuario`),
   CONSTRAINT `reserva_ibfk_1` FOREIGN KEY (`fk_id_sala`) REFERENCES `sala` (`id_sala`),
   CONSTRAINT `reserva_ibfk_2` FOREIGN KEY (`fk_id_usuario`) REFERENCES `usuario` (`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +45,7 @@ CREATE TABLE `reserva` (
 
 LOCK TABLES `reserva` WRITE;
 /*!40000 ALTER TABLE `reserva` DISABLE KEYS */;
-INSERT INTO `reserva` VALUES (1,1,1,'2025-04-29','10:00:00','11:00:00'),(2,1,1,'2025-04-28','14:00:00','15:00:00'),(3,10,1,'2025-04-28','14:00:00','15:00:00'),(4,2,1,'2025-04-29','09:00:00','10:00:00'),(5,3,1,'2025-04-29','16:00:00','17:00:00'),(6,1,1,'2025-05-31','07:00:00','08:00:00'),(7,1,1,'2025-05-31','20:00:00','21:00:00'),(8,1,1,'2025-05-05','15:00:00','16:00:00'),(9,1,1,'2025-05-05','16:00:00','17:00:00'),(10,1,1,'2025-05-05','17:00:00','18:00:00'),(11,1,1,'2025-05-05','18:00:00','19:00:00'),(12,1,1,'2025-05-05','19:00:00','20:00:00'),(13,1,1,'2025-05-05','20:00:00','21:00:00');
+INSERT INTO `reserva` VALUES (1,1,1,'2025-04-29','10:00:00','11:00:00'),(2,1,1,'2025-04-28','14:00:00','15:00:00'),(3,10,1,'2025-04-28','14:00:00','15:00:00'),(4,2,1,'2025-04-29','09:00:00','10:00:00'),(5,3,1,'2025-04-29','16:00:00','17:00:00'),(6,1,1,'2025-05-31','07:00:00','08:00:00'),(7,1,1,'2025-05-31','20:00:00','21:00:00'),(8,1,1,'2025-05-05','15:00:00','16:00:00'),(9,1,1,'2025-05-05','16:00:00','17:00:00'),(10,1,1,'2025-05-05','17:00:00','18:00:00'),(11,1,1,'2025-05-05','18:00:00','19:00:00'),(12,1,1,'2025-05-05','19:00:00','20:00:00'),(13,1,1,'2025-05-05','20:00:00','21:00:00'),(14,1,1,'2025-05-12','07:00:00','08:00:00'),(15,1,1,'2025-05-06','07:00:00','08:00:00');
 /*!40000 ALTER TABLE `reserva` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -101,7 +101,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,'joao da silva','@','11111111111','123'),(3,'gaby','@2','11111111112','123'),(4,'jao','j@','12345678910','123'),(5,'12','12@12','12121212121','12');
+INSERT INTO `usuario` VALUES (1,'joao da silva','@5','11111111113','123'),(3,'gaby','@2','11111111112','123'),(4,'jao','j@','12345678910','123');
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -237,4 +237,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-05 11:16:00
+-- Dump completed on 2025-05-05 16:17:43
