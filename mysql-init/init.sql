@@ -36,7 +36,7 @@ CREATE TABLE `reserva` (
   KEY `fk_id_usuario` (`fk_id_usuario`),
   CONSTRAINT `reserva_ibfk_1` FOREIGN KEY (`fk_id_sala`) REFERENCES `sala` (`id_sala`),
   CONSTRAINT `reserva_ibfk_2` FOREIGN KEY (`fk_id_usuario`) REFERENCES `usuario` (`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +45,7 @@ CREATE TABLE `reserva` (
 
 LOCK TABLES `reserva` WRITE;
 /*!40000 ALTER TABLE `reserva` DISABLE KEYS */;
-INSERT INTO `reserva` VALUES (1,1,1,'2025-04-29','10:00:00','11:00:00'),(2,1,1,'2025-04-28','14:00:00','15:00:00'),(3,10,1,'2025-04-28','14:00:00','15:00:00'),(4,2,1,'2025-04-29','09:00:00','10:00:00'),(5,3,1,'2025-04-29','16:00:00','17:00:00');
+INSERT INTO `reserva` VALUES (1,1,1,'2025-04-29','10:00:00','11:00:00'),(2,1,1,'2025-04-28','14:00:00','15:00:00'),(3,10,1,'2025-04-28','14:00:00','15:00:00'),(4,2,1,'2025-04-29','09:00:00','10:00:00'),(5,3,1,'2025-04-29','16:00:00','17:00:00'),(6,1,1,'2025-05-31','07:00:00','08:00:00'),(7,1,1,'2025-05-31','20:00:00','21:00:00'),(8,1,1,'2025-05-05','15:00:00','16:00:00'),(9,1,1,'2025-05-05','16:00:00','17:00:00'),(10,1,1,'2025-05-05','17:00:00','18:00:00'),(11,1,1,'2025-05-05','18:00:00','19:00:00'),(12,1,1,'2025-05-05','19:00:00','20:00:00'),(13,1,1,'2025-05-05','20:00:00','21:00:00');
 /*!40000 ALTER TABLE `reserva` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -92,7 +92,7 @@ CREATE TABLE `usuario` (
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `cpf` (`cpf`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -101,7 +101,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,'jao','@','11111111111','123'),(3,'gaby','@2','11111111112','123');
+INSERT INTO `usuario` VALUES (1,'joao da silva','@','11111111111','123'),(3,'gaby','@2','11111111112','123'),(4,'jao','j@','12345678910','123'),(5,'12','12@12','12121212121','12');
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -112,6 +112,37 @@ UNLOCK TABLES;
 --
 -- Dumping routines for database 'senai'
 --
+/*!50003 DROP FUNCTION IF EXISTS `fn_validar_login` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`alunods`@`%` FUNCTION `fn_validar_login`(p_email VARCHAR(255), p_senha VARCHAR(255)) RETURNS int
+    DETERMINISTIC
+BEGIN
+    DECLARE user_id INT;
+    
+    SELECT id_usuario INTO user_id
+    FROM usuario 
+    WHERE email = p_email AND senha = p_senha
+    LIMIT 1;
+    
+    IF user_id IS NULL THEN
+        RETURN 0;
+    ELSE
+        RETURN user_id;
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `sp_get_sala_reservada` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -206,4 +237,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-28 14:23:57
+-- Dump completed on 2025-05-05 11:16:00

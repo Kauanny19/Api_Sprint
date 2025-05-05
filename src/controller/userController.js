@@ -176,43 +176,45 @@ module.exports = class userController {
   // Método de Login
   static async postLogin(req, res) {
     const { email, senha } = req.body;
-
+  
     if (!email || !senha) {
       return res.status(400).json({ error: "Email e senha são obrigatórios" });
     }
-
-    const query = `SELECT * FROM usuario WHERE email = '${email}' AND senha = '${senha}'`;
-
+  
+    // Usando uma function SQL para validar login
+    const query = `SELECT fn_validar_login(?, ?) AS usuario_id`;
+    
     try {
-      connect.query(query, [email], (err, results) => {
+      connect.query(query, [email, senha], (err, results) => {
         if (err) {
           console.error("Erro ao executar a consulta:", err);
           return res.status(500).json({ error: "Erro interno do servidor" });
         }
-
-        if (results.length === 0) {
+  
+        const usuarioId = results[0].usuario_id;
+        
+        if (usuarioId <= 0) {
           return res.status(401).json({ error: "Credenciais inválidas" });
         }
-
-        const user = results[0];
-
-        if (user.senha !== senha) {
-          return res.status(401).json({ error: "Senha incorreta" });
-        }
-
-        const token = jwt.sign({ id: user.id_usuario }, process.env.SECRET, {
-          expiresIn: "1h",
+  
+        // Obtém os dados do usuário
+        const getUserQuery = `SELECT id_usuario, nome, email, cpf FROM usuario WHERE id_usuario = ?`;
+        connect.query(getUserQuery, [usuarioId], (err, userResults) => {
+          if (err) {
+            return res.status(500).json({ error: "Erro ao obter dados do usuário" });
+          }
+  
+          const user = userResults[0];
+          const token = jwt.sign({ id: user.id_usuario }, process.env.SECRET, {
+            expiresIn: "1h",
+          });
+  
+          return res.status(200).json({
+            message: "Login bem-sucedido",
+            user,
+            token
+          });
         });
-
-        // Remove um atributo de um obj 
-        delete user.password;
-
-        return res.status(200).json({
-          message: "Login bem-sucedido",
-          user,
-          token
-        })
-
       });
     } catch (error) {
       console.error("Erro ao executar a consulta:", error);
