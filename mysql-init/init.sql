@@ -36,7 +36,7 @@ CREATE TABLE `reserva` (
   KEY `fk_id_usuario` (`fk_id_usuario`),
   CONSTRAINT `reserva_ibfk_1` FOREIGN KEY (`fk_id_sala`) REFERENCES `sala` (`id_sala`),
   CONSTRAINT `reserva_ibfk_2` FOREIGN KEY (`fk_id_usuario`) REFERENCES `usuario` (`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +45,7 @@ CREATE TABLE `reserva` (
 
 LOCK TABLES `reserva` WRITE;
 /*!40000 ALTER TABLE `reserva` DISABLE KEYS */;
-INSERT INTO `reserva` VALUES (1,1,1,'2025-04-29','10:00:00','11:00:00'),(2,1,1,'2025-04-28','14:00:00','15:00:00'),(3,10,1,'2025-04-28','14:00:00','15:00:00'),(4,2,1,'2025-04-29','09:00:00','10:00:00'),(5,3,1,'2025-04-29','16:00:00','17:00:00');
+INSERT INTO `reserva` VALUES (1,1,1,'2025-04-29','10:00:00','11:00:00'),(2,1,1,'2025-04-28','14:00:00','15:00:00'),(3,10,1,'2025-04-28','14:00:00','15:00:00'),(4,2,1,'2025-04-29','09:00:00','10:00:00'),(5,3,1,'2025-04-29','16:00:00','17:00:00'),(6,1,3,'2025-04-29','10:00:00','11:00:00');
 /*!40000 ALTER TABLE `reserva` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -269,4 +269,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-14 16:14:39
+-- Dump completed on 2025-05-14 16:24:51
