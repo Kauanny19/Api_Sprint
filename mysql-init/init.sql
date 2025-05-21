@@ -122,7 +122,7 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`alunods`@`%` FUNCTION `fn_validar_login`(p_email VARCHAR(255), p_senha VARCHAR(255)) RETURNS int
+CREATE DEFINER=`root`@`localhost` FUNCTION `fn_validar_login`(p_email VARCHAR(255), p_senha VARCHAR(255)) RETURNS int
     DETERMINISTIC
 BEGIN
     DECLARE user_id INT;
@@ -153,7 +153,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`alunods`@`%` PROCEDURE `ListarReservasPorUsuario`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ListarReservasPorUsuario`(
     in id_usuario int
 )
 begin
@@ -185,7 +185,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`alunods`@`%` PROCEDURE `sp_get_sala_reservada`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_sala_reservada`(
   IN p_id_sala INT,
   IN p_data DATE
 )
@@ -269,4 +269,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-14 16:24:51
+-- Dump completed on 2025-05-21 13:06:58
