@@ -279,6 +279,7 @@ module.exports = class ControllerReserva {
   }
 };
 
+
 // Função auxiliar que formata os campos de data e horário de uma reserva
 function reservaFormat(reserva) {
   // Se o campo 'data' for do tipo Date, converte para o formato YYYY-MM-DD
