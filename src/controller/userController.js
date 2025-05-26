@@ -58,7 +58,7 @@ module.exports = class userController {
   }
   static async getUserById(req, res) {
     const userId = req.params.id;
-    const query = `SELECT * FROM usuario WHERE cpf = ?`;
+    const query = `SELECT * FROM usuario WHERE id_usuario = ?`;
     const values = [userId];
 
     try {
@@ -73,7 +73,7 @@ module.exports = class userController {
         }
 
         return res.status(200).json({
-          message: "Obtendo usuário com CPF: " + userId,
+          message: "Obtendo usuário com id: " + userId,
           user: results[0],
         });
       });

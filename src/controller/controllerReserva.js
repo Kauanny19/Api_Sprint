@@ -3,6 +3,7 @@ const connect = require("../db/connect"); // Conexão com o banco de dados
 const validateReserva = require("../services/validateReserva"); // Valida os dados da reserva
 const validateHorario = require("../services/validateHorario"); // Verifica se há conflito de horário
 const validateId = require("../services/validateId"); // Verifica se IDs de usuário e sala existem
+const listarReservasPorUsuario = require("../services/listarReservasPorUsuario");
 
 // Função auxiliar para usar Promises com consultas SQL
 const queryAsync = (query, values) => {
@@ -202,7 +203,6 @@ module.exports = class ControllerReserva {
     }
   }
 
-  
   static async getHorariosSala(req, res) {
     // Extrai os parâmetros 'id_sala' e 'data'
     const { id_sala, data } = req.params;
@@ -277,8 +277,35 @@ module.exports = class ControllerReserva {
       return res.status(500).json({ error: "Erro ao obter horários da sala." });
     }
   }
-};
 
+  // Dentro da classe ControllerReserva
+  static async getReservasPorUsuario(req, res) {
+    const { id_usuario } = req.params;
+
+    if (!id_usuario) {
+      return res.status(400).json({ error: "ID do usuário é obrigatório." });
+    }
+
+    try {
+      const reservas = await listarReservasPorUsuario(id_usuario);
+
+      // Formata as datas e horários para exibição, se necessário
+      const reservasFormatadas = reservas.map((reserva) =>
+        reservaFormat(reserva)
+      );
+
+      return res.status(200).json({
+        message: `Reservas do usuário ${id_usuario}`,
+        reservas: reservasFormatadas,
+      });
+    } catch (error) {
+      console.error(error);
+      return res
+        .status(500)
+        .json({ error: "Erro ao buscar reservas do usuário." });
+    }
+  }
+};
 
 // Função auxiliar que formata os campos de data e horário de uma reserva
 function reservaFormat(reserva) {

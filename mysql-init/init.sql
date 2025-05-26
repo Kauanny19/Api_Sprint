@@ -191,9 +191,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_sala_reservada`(
 )
 BEGIN
   -- Declare variables for business hours (can be adjusted as needed)
-  DECLARE v_start_time TIME DEFAULT '08:00:00';
-  DECLARE v_end_time TIME DEFAULT '18:00:00';
-  DECLARE v_sala_duration INT DEFAULT 30; -- Duration in minutes
+  DECLARE v_start_time TIME DEFAULT '07:00:00';
+  DECLARE v_end_time TIME DEFAULT '23:00:00';
+  DECLARE v_sala_duration INT DEFAULT 60; -- Duration in minutes
   
   -- Temporary table to store all possible time salas
   DROP TEMPORARY TABLE IF EXISTS temp_all_salas;
@@ -269,4 +269,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-21 13:06:58
+-- Dump completed on 2025-05-26 15:23:21

@@ -9,7 +9,7 @@ router.post("/user/", userController.createUser);
 router.post("/user/login", userController.postLogin);
 router.get("/user/", verifyJWT, userController.getAllUsers);
 router.get("/user/:id", verifyJWT, userController.getUserById);
-router.put("/user", verifyJWT, userController.updateUser); 
+router.put("/user/", verifyJWT, userController.updateUser); 
 router.delete("/user/:id", verifyJWT, userController.deleteUser); 
 
 //Classroom
@@ -25,7 +25,9 @@ router.get("/reserva/",verifyJWT, controllerReserva.getReservas);
 router.put("/reserva/:id",verifyJWT, controllerReserva.updateReserva);
 router.delete("/reserva/:id_reserva",verifyJWT, controllerReserva.deleteReserva);
 router.get("/reserva/horarios/:id_sala/:data",verifyJWT, controllerReserva.getHorariosSala);
+router.get("/reserva/:id_usuario", controllerReserva.getReservasPorUsuario);
+
 
 module.exports = router;
 
-// http://10.89.240.77:3000/api/
+// http://10.89.240.77:3000/api/reserva
