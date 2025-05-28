@@ -22,10 +22,10 @@ router.delete("/sala/:numero", verifyJWT, classroomController.deleteClassroom);
 // Reservas
 router.post("/reserva/",verifyJWT, controllerReserva.createReserva);
 router.get("/reserva/",verifyJWT, controllerReserva.getReservas);
-router.put("/reserva/:id",verifyJWT, controllerReserva.updateReserva);
+router.put("/reserva/:id_reserva",verifyJWT, controllerReserva.updateReserva);
 router.delete("/reserva/:id_reserva",verifyJWT, controllerReserva.deleteReserva);
 router.get("/reserva/horarios/:id_sala/:data",verifyJWT, controllerReserva.getHorariosSala);
-router.get("/reserva/:id_usuario", controllerReserva.getReservasPorUsuario);
+router.get("/reserva/usuario/:id_usuario", controllerReserva.getReservasPorUsuario);
 
 
 module.exports = router;

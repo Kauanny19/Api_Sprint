@@ -175,7 +175,7 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `sp_get_sala_reservada` */;
+/*!50003 DROP PROCEDURE IF EXISTS `getHorariosSala` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -185,14 +185,14 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_sala_reservada`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getHorariosSala`(
   IN p_id_sala INT,
   IN p_data DATE
 )
 BEGIN
   -- Declare variables for business hours (can be adjusted as needed)
-  DECLARE v_start_time TIME DEFAULT '07:00:00';
-  DECLARE v_end_time TIME DEFAULT '23:00:00';
+  DECLARE horarioAbertura TIME DEFAULT '07:00:00';
+  DECLARE horarioFechamento TIME DEFAULT '23:00:00';
   DECLARE v_sala_duration INT DEFAULT 60; -- Duration in minutes
   
   -- Temporary table to store all possible time salas
@@ -203,9 +203,9 @@ BEGIN
   );
   
   -- Populate temporary table with all possible time salas
-  SET @current_time = v_start_time;
+  SET @current_time = horarioAbertura;
   
-  WHILE @current_time < v_end_time DO
+  WHILE @current_time < horarioFechamento DO
     INSERT INTO temp_all_salas (sala_start, sala_end)
     VALUES (
       @current_time,
