@@ -27,7 +27,6 @@ router.delete("/reserva/:id_reserva",verifyJWT, controllerReserva.deleteReserva)
 router.get("/reserva/horarios/:id_sala/:data",verifyJWT, controllerReserva.getHorariosSala);
 router.get("/reserva/usuario/:id_usuario", controllerReserva.getReservasPorUsuario);
 
-
 module.exports = router;
 
 // http://10.89.240.77:3000/api/reserva

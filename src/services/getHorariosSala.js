@@ -7,24 +7,23 @@ module.exports = function getHorariosSala(id_sala, data) {
       if (err){
         return reject({ error: "Erro ao buscar salas"});
       }
-      return resolve(results[0]);
-    });
-    
-    const horariosIndisponiveis = results[0].map((item) => ({
+      
+      const Indisponiveis = results[0].map((item) => ({
         id_reserva: item.id_reserva,
         nomeUsuario: item.nomeUsuario,
         inicio: item.horarioInicio.toString().slice(0, 5),
         fim: item.horarioFim.toString().slice(0, 5),
       }));
 
-      const horariosDisponiveis = results[1].map((item) => ({
+      const Disponiveis = results[1].map((item) => ({
         inicio: item.horarioInicio.toString().slice(0, 5),
         fim: item.horarioFim.toString().slice(0, 5),
       }));
 
       resolve({
-        horariosIndisponiveis,
-        horariosDisponiveis,
+        Indisponiveis,
+        Disponiveis,
       });
+    });
   });
 };

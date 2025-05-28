@@ -1,7 +1,8 @@
 // Importações necessárias
 const connect = require("../db/connect");
 const validateReserva = require("../services/validateReserva");
-const listarReservasPorUsuario = require("../services/listarReservasPorUsuario");
+const listarReservasPorUsuario = require("../services/listarReservasPorUsuario"); //Procedure
+const getHorariosSala = require("../services/getHorariosSala"); //Procedure
 
 // Função auxiliar para usar Promises com consultas SQL
 const queryAsync = (query, values) => {
@@ -14,10 +15,11 @@ const queryAsync = (query, values) => {
 };
 
 module.exports = class ControllerReserva {
-
   //Create Reserva
   static async createReserva(req, res) {
-    const { id_usuario, fk_id_sala, data, horarioInicio, horarioFim } = req.body;
+    const { id_usuario, fk_id_sala, data, horarioInicio, horarioFim } =
+    req.body;
+      console.log(req.body)
 
     const validation = validateReserva({
       fk_id_usuario: id_usuario,
@@ -32,17 +34,24 @@ module.exports = class ControllerReserva {
     }
 
     try {
-      const usuario = await queryAsync("SELECT id_usuario FROM usuario WHERE id_usuario = ?", [id_usuario]);
+      const usuario = await queryAsync(
+        "SELECT id_usuario FROM usuario WHERE id_usuario = ?",
+        [id_usuario]
+      );
       if (usuario.length === 0) {
         return res.status(400).json({ error: "Usuário não encontrado" });
       }
 
-      const sala = await queryAsync("SELECT id_sala FROM sala WHERE id_sala = ?", [fk_id_sala]);
+      const sala = await queryAsync(
+        "SELECT id_sala FROM sala WHERE id_sala = ?",
+        [fk_id_sala]
+      );
       if (sala.length === 0) {
         return res.status(400).json({ error: "Sala não encontrada" });
       }
 
-      const conflito = await queryAsync(`
+      const conflito = await queryAsync(
+        `
         SELECT id_reserva FROM reserva
         WHERE fk_id_sala = ? AND data = ? AND (
           (horarioInicio < ? AND horarioFim > ?) OR
@@ -50,17 +59,25 @@ module.exports = class ControllerReserva {
           (horarioInicio >= ? AND horarioInicio < ?) OR
           (horarioFim > ? AND horarioFim <= ?)
         )
-      `, [
-        fk_id_sala,
-        data,
-        horarioInicio, horarioInicio,
-        horarioInicio, horarioFim,
-        horarioInicio, horarioFim,
-        horarioInicio, horarioFim
-      ]);
+      `,
+        [
+          fk_id_sala,
+          data,
+          horarioInicio,
+          horarioInicio,
+          horarioInicio,
+          horarioFim,
+          horarioInicio,
+          horarioFim,
+          horarioInicio,
+          horarioFim,
+        ]
+      );
 
       if (conflito.length > 0) {
-        return res.status(400).json({ error: "A sala já está reservada neste dia e horário." });
+        return res
+          .status(400)
+          .json({ error: "A sala já está reservada neste dia e horário." });
       }
 
       const query = `
@@ -124,10 +141,14 @@ module.exports = class ControllerReserva {
           fk_id_sala,
           data,
           reservaId,
-          horarioInicio, horarioInicio,
-          horarioInicio, horarioFim,
-          horarioInicio, horarioFim,
-          horarioInicio, horarioFim,
+          horarioInicio,
+          horarioInicio,
+          horarioInicio,
+          horarioFim,
+          horarioInicio,
+          horarioFim,
+          horarioInicio,
+          horarioFim,
         ]
       );
 
@@ -172,7 +193,9 @@ module.exports = class ControllerReserva {
         reservaFormat(reserva)
       );
 
-      return res.status(200).json({ message: "Lista de Reservas", reservas: reservasFormatadas });
+      return res
+        .status(200)
+        .json({ message: "Lista de Reservas", reservas: reservasFormatadas });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Erro interno do servidor" });
@@ -203,46 +226,17 @@ module.exports = class ControllerReserva {
     const { id_sala, data } = req.params;
 
     if (!id_sala || !data) {
-      return res.status(400).json({ error: "Parâmetros 'id_sala' e 'data' são obrigatórios." });
+      return res
+        .status(400)
+        .json({ error: "Parâmetros 'id_sala' e 'data' são obrigatórios." });
     }
 
     try {
-      const query = `
-      SELECT horarioInicio, horarioFim
-      FROM reserva
-      WHERE fk_id_sala = ? AND data = ?
-    `;
-
-      const reservas = await queryAsync(query, [id_sala, data]);
-
-      const indisponiveis = reservas.map((r) => ({
-        inicio: r.horarioInicio.toString().slice(0, 5),
-        fim: r.horarioInicio.toString().slice(0, 5),
-      }));
-
-      const horarioAbertura = 7;
-      const horarioFechamento = 23;
-      const intervaloHoras = 1;
-      let disponiveis = [];
-
-      for (let h = horarioAbertura; h < horarioFechamento; h += intervaloHoras) {
-        const horaInicio = `${h.toString().padStart(2, "0")}:00`;
-        const horaFim = `${(h + intervaloHoras).toString().padStart(2, "0")}:00`;
-
-        const conflita = indisponiveis.some(
-          (b) => !(horaFim <= b.inicio || horaInicio >= b.fim)
-        );
-
-        if (!conflita) {
-          disponiveis.push({ inicio: horaInicio, fim: horaFim });
-        }
-      }
-
+      const horarios = await getHorariosSala(id_sala, data);
       return res.status(200).json({
         sala: id_sala,
         data,
-        horariosIndisponiveis: indisponiveis,
-        horariosDisponiveis: disponiveis,
+        horarios,
       });
     } catch (error) {
       console.error(error);
@@ -271,7 +265,9 @@ module.exports = class ControllerReserva {
       });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar reservas do usuário." });
+      return res
+        .status(500)
+        .json({ error: "Erro ao buscar reservas do usuário." });
     }
   }
 };
