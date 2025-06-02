@@ -18,6 +18,36 @@ USE `senai`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `logexclusaoreserva`
+--
+
+DROP TABLE IF EXISTS `logexclusaoreserva`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `logexclusaoreserva` (
+  `id_log` int NOT NULL AUTO_INCREMENT,
+  `id_reserva` int DEFAULT NULL,
+  `nome_usuario` varchar(50) DEFAULT NULL,
+  `fk_id_sala` int DEFAULT NULL,
+  `data_reserva` date DEFAULT NULL,
+  `horario_inicio` time DEFAULT NULL,
+  `horario_fim` time DEFAULT NULL,
+  `data_exclusao` datetime DEFAULT NULL,
+  PRIMARY KEY (`id_log`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `logexclusaoreserva`
+--
+
+LOCK TABLES `logexclusaoreserva` WRITE;
+/*!40000 ALTER TABLE `logexclusaoreserva` DISABLE KEYS */;
+INSERT INTO `logexclusaoreserva` VALUES (1,3,'joao da silva',10,'2025-04-28','14:00:00','15:00:00','2025-06-02 14:36:57');
+/*!40000 ALTER TABLE `logexclusaoreserva` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `reserva`
 --
 
@@ -45,9 +75,51 @@ CREATE TABLE `reserva` (
 
 LOCK TABLES `reserva` WRITE;
 /*!40000 ALTER TABLE `reserva` DISABLE KEYS */;
-INSERT INTO `reserva` VALUES (1,1,1,'2025-04-29','10:00:00','11:00:00'),(2,1,1,'2025-04-28','14:00:00','15:00:00'),(3,10,1,'2025-04-28','14:00:00','15:00:00'),(4,2,1,'2025-04-29','09:00:00','10:00:00'),(5,3,1,'2025-04-29','16:00:00','17:00:00'),(6,1,3,'2025-04-29','10:00:00','11:00:00');
+INSERT INTO `reserva` VALUES (1,1,1,'2025-04-29','10:00:00','11:00:00'),(2,1,1,'2025-04-28','14:00:00','15:00:00'),(4,2,1,'2025-04-29','09:00:00','10:00:00'),(5,3,1,'2025-04-29','16:00:00','17:00:00'),(6,1,3,'2025-04-29','10:00:00','11:00:00');
 /*!40000 ALTER TABLE `reserva` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `tr_logExclusaoReserva` BEFORE DELETE ON `reserva` FOR EACH ROW begin
+  declare v_nome_usuario varchar(50);
+
+  -- Busca o nome do usuário baseado na FK
+  select nome into v_nome_usuario
+  from usuario
+  where id_usuario = old.fk_id_usuario;
+
+  -- Insere os dados no log
+  insert into logExclusaoReserva (
+    id_reserva,
+    nome_usuario,
+    fk_id_sala,
+    data_reserva,
+    horario_inicio,
+    horario_fim,
+    data_exclusao
+  )
+  values (
+    old.id_reserva,
+    v_nome_usuario,
+    old.fk_id_sala,
+    old.data,
+    old.horarioInicio,
+    old.horarioFim,
+    now()
+  );
+end */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `sala`
@@ -296,6 +368,7 @@ begin
         totalReservas,
         u.nome as nomeUsuario,
         s.numero as nomeSala,
+        s.descricao,
         r.data,
         r.horarioInicio,
         r.horarioFim
@@ -320,4 +393,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-02 14:08:07
+-- Dump completed on 2025-06-02 14:40:26

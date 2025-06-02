@@ -14,3 +14,5 @@ begin
 end; //
 
 delimiter ;
+
+select totalReservasPorUsuario(1);

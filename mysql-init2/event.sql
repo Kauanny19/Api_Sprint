@@ -1,5 +1,5 @@
 create event if not exists excluirReservasAntigas
-    on schedule every 1 week
+    on schedule every 1 day
     starts current_timestamp + interval 5 minute
     on completion preserve
     enable
