@@ -89,7 +89,7 @@ module.exports = class userController {
     const VerificarToken = userId;
 
     // Aqui você precisa ter certeza que `req.user.id` existe, ou adaptar conforme seu token
-    if (VerificarToken !== req.userId) {
+    if (Number(VerificarToken) !== Number(req.userId)) {
       return res
         .status(403)
         .json({ error: "Usuário não autorizado a atualizar este perfil" });

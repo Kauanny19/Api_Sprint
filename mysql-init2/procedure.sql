@@ -22,4 +22,5 @@ begin
 end; //
 
 delimiter ;
+
 call ListarReservasPorUsuario()
