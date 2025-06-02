@@ -5,5 +5,5 @@ create event if not exists excluirReservasAntigas
     enable
 do
     delete from reserva
-    where data < now() - interval 1 year;
+    where data < now() - interval 6 month;
 
