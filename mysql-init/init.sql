@@ -369,6 +369,7 @@ begin
         u.nome as nomeUsuario,
         s.numero as nomeSala,
         s.descricao,
+        s.capacidade,
         r.data,
         r.horarioInicio,
         r.horarioFim
@@ -376,7 +377,7 @@ begin
     join usuario u on r.fk_id_usuario = u.id_usuario
     join sala s on r.fk_id_sala = s.id_sala
     where r.fk_id_usuario = id_usuario
-    order by u.nome, r.data, r.horarioInicio;
+    order by r.data, r.horarioInicio;
 end ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
