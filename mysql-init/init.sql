@@ -370,6 +370,7 @@ begin
         s.numero as nomeSala,
         s.descricao,
         s.capacidade,
+        r.id_reserva
         r.data,
         r.horarioInicio,
         r.horarioFim
