@@ -143,35 +143,32 @@ module.exports = class userController {
   }
   static async deleteUser(req, res) {
     const userId = req.params.id;
-    const usuarioId = req.userId; // ID do usuário autenticado (via token)
+    const usuarioId = req.userId; // ID do usuário autenticado via token
 
-    // Verifica se o usuário autenticado está tentando deletar outro usuário
+    // Verifica se o usuário autenticado é o mesmo que está tentando deletar
     if (Number(userId) !== Number(usuarioId)) {
       return res
         .status(403)
         .json({ error: "Usuário não autorizado a deletar este perfil" });
     }
 
-    const query = `DELETE FROM usuario WHERE id_usuario = ?`;
-    const values = [userId];
-
     try {
-      connect.query(query, values, function (err, results) {
+      const query = `CALL deletarUsuarioComReservas(?)`;
+
+      connect.query(query, [userId], (err, results) => {
         if (err) {
-          console.log(err);
-          return res.status(500).json({ error: "Erro interno do servidor" });
+          console.error("Erro ao executar procedure:", err);
+          return res
+            .status(500)
+            .json({ error: "Erro ao excluir usuário e reservas" });
         }
 
-        if (results.affectedRows === 0) {
-          return res.status(404).json({ error: "Usuário não encontrado" });
-        }
-
-        return res
-          .status(200)
-          .json({ message: "Usuário excluído com ID: " + userId });
+        return res.status(200).json({
+          message: `Usuário (ID: ${userId}) e suas reservas foram excluídos com sucesso`,
+        });
       });
     } catch (error) {
-      console.log("Erro ao executar a consulta:", error);
+      console.error("Erro inesperado:", error);
       return res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
@@ -216,7 +213,7 @@ module.exports = class userController {
         return res.status(200).json({
           message: "Login bem-sucedido",
           user,
-          token, 
+          token,
         });
       });
     } catch (error) {
