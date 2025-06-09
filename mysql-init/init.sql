@@ -48,6 +48,33 @@ INSERT INTO `logexclusaoreserva` VALUES (1,3,'joao da silva',10,'2025-04-28','14
 UNLOCK TABLES;
 
 --
+-- Table structure for table `logexclusaousuario`
+--
+
+DROP TABLE IF EXISTS `logexclusaousuario`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `logexclusaousuario` (
+  `id_log` int NOT NULL AUTO_INCREMENT,
+  `id_usuario` int DEFAULT NULL,
+  `nome` varchar(50) DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `cpf` varchar(50) DEFAULT NULL,
+  `data_exclusao` datetime DEFAULT NULL,
+  PRIMARY KEY (`id_log`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `logexclusaousuario`
+--
+
+LOCK TABLES `logexclusaousuario` WRITE;
+/*!40000 ALTER TABLE `logexclusaousuario` DISABLE KEYS */;
+/*!40000 ALTER TABLE `logexclusaousuario` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `reserva`
 --
 
@@ -176,6 +203,33 @@ LOCK TABLES `usuario` WRITE;
 INSERT INTO `usuario` VALUES (1,'joao da silva','@5','11111111113','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i'),(3,'gaby','@2','11111111112','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i'),(4,'jao','j@','12345678910','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i'),(8,'jojo','jo@','12312312312','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i');
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `tr_logExclusaoUsuario` BEFORE DELETE ON `usuario` FOR EACH ROW BEGIN
+  INSERT INTO logexclusaousuario (
+    id_usuario,
+    nome,
+    data_exclusao
+  )
+  VALUES (
+    OLD.id_usuario,
+    OLD.nome,
+    OLD.email,
+    NOW()
+  );
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Dumping events for database 'senai'
@@ -227,6 +281,31 @@ begin
     
     return total;
 end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `deletarUsuarioComReservas` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deletarUsuarioComReservas`(IN p_id_usuario INT)
+BEGIN
+  -- Passo 1: Deletar as reservas do usuário (ativa a trigger automaticamente)
+  DELETE FROM reserva
+  WHERE fk_id_usuario = p_id_usuario;
+
+  -- Passo 2: Deletar o próprio usuário
+  DELETE FROM usuario
+  WHERE id_usuario = p_id_usuario;
+END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -364,4 +443,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-09 12:53:23
+-- Dump completed on 2025-06-09 13:29:20

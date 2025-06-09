@@ -48,3 +48,39 @@ delimiter ;
 
 
 select * from logExclusaoReserva;
+
+
+create table if not exists logexclusaousuario (
+  id_log int not null auto_increment,
+  id_usuario int,
+  nome varchar(50),
+  email varchar(50),
+  cpf varchar(50),
+  data_exclusao datetime,
+  primary key(id_log)
+);
+
+
+delimiter $$
+
+create trigger tr_logExclusaoUsuario
+before delete on usuario
+for each row
+begin
+  insert into logexclusaousuario (
+    id_usuario,
+    nome,
+    email,
+    cpf,
+    data_exclusao
+  )
+  values (
+    old.id_usuario,
+    old.nome,
+    old.email,
+    old.cpf,
+    now()
+  );
+end $$
+
+delimiter ;
