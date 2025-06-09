@@ -216,6 +216,7 @@ DELIMITER ;;
   INSERT INTO logexclusaousuario (
     id_usuario,
     nome,
+    email,
     data_exclusao
   )
   VALUES (
