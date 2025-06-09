@@ -1,4 +1,4 @@
-create table logExclusaoReserva (
+create table logexclusaoreserva (
   id_log int auto_increment primary key,
   id_reserva int,
   nome_usuario varchar(50),

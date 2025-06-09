@@ -96,7 +96,7 @@ DELIMITER ;;
   where id_usuario = old.fk_id_usuario;
 
   -- Insere os dados no log
-  insert into logExclusaoReserva (
+  insert into logexclusaoreserva (
     id_reserva,
     nome_usuario,
     fk_id_sala,
@@ -160,7 +160,7 @@ CREATE TABLE `usuario` (
   `nome` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
   `cpf` varchar(50) NOT NULL,
-  `senha` varchar(50) NOT NULL,
+  `senha` varchar(255) NOT NULL,
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `cpf` (`cpf`)
@@ -173,7 +173,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,'joao da silva','@5','11111111113','123'),(3,'gaby','@2','11111111112','123'),(4,'jao','j@','12345678910','123'),(8,'jojo','jo@','12312312312','123');
+INSERT INTO `usuario` VALUES (1,'joao da silva','@5','11111111113','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i'),(3,'gaby','@2','11111111112','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i'),(4,'jao','j@','12345678910','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i'),(8,'jojo','jo@','12312312312','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i');
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -206,37 +206,6 @@ DELIMITER ;
 --
 -- Dumping routines for database 'senai'
 --
-/*!50003 DROP FUNCTION IF EXISTS `fn_validar_login` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `fn_validar_login`(p_email VARCHAR(255), p_senha VARCHAR(255)) RETURNS int
-    DETERMINISTIC
-BEGIN
-    DECLARE user_id INT;
-    
-    SELECT id_usuario INTO user_id
-    FROM usuario 
-    WHERE email = p_email AND senha = p_senha
-    LIMIT 1;
-    
-    IF user_id IS NULL THEN
-        RETURN 0;
-    ELSE
-        RETURN user_id;
-    END IF;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP FUNCTION IF EXISTS `totalReservasPorUsuario` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -361,7 +330,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ListarReservasPorUsuario`(
     in id_usuario int
 )
 begin
-	declare totalReservas int;
+    declare totalReservas int;
     set totalReservas = totalReservasPorUsuario(id_usuario);
     select
         u.id_usuario,
@@ -370,7 +339,7 @@ begin
         s.numero as nomeSala,
         s.descricao,
         s.capacidade,
-        r.id_reserva
+        r.id_reserva,
         r.data,
         r.horarioInicio,
         r.horarioFim
@@ -395,4 +364,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-02 14:40:26
+-- Dump completed on 2025-06-09 12:53:23

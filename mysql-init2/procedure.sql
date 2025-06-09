@@ -25,4 +25,20 @@ end; //
 
 delimiter ;
 
+delimiter //
+
+create procedure deletarUsuarioComReservas(in p_id_usuario int)
+begin
+  -- Excluir reservas (isso ativa a trigger de log automaticamente)
+  delete from reserva where fk_id_usuario = p_id_usuario;
+
+  -- Excluir o usuário
+  delete from usuario where id_usuario = p_id_usuario;
+end; //
+
+delimiter ;
+
+
 call ListarReservasPorUsuario()
+call deletarUsuarioComReservas();
+

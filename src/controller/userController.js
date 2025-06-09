@@ -2,6 +2,8 @@ const connect = require("../db/connect");
 const validateUser = require("../services/validateUser");
 const validateCpf = require("../services/validateCpf");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const SALT_ROUNDS = 10;
 
 module.exports = class userController {
   static async createUser(req, res) {
@@ -17,8 +19,10 @@ module.exports = class userController {
       if (cpfError) {
         return res.status(400).json(cpfError);
       }
+      const hashedPassword = await bcrypt.hash(senha, SALT_ROUNDS);
+
       const query = `INSERT INTO usuario (cpf, senha, email, nome) VALUES (?, ?, ?, ?)`;
-      connect.query(query, [cpf, senha, email, nome], (err) => {
+      connect.query(query, [cpf, hashedPassword, email, nome], (err) => {
         if (err) {
           if (err.code === "ER_DUP_ENTRY") {
             if (err.message.includes("email")) {
@@ -43,7 +47,7 @@ module.exports = class userController {
     try {
       connect.query(query, function (err, results) {
         if (err) {
-          console.error(err);
+          console.log(err);
           return res.status(500).json({ error: "Erro interno do servidor" });
         }
 
@@ -52,7 +56,7 @@ module.exports = class userController {
           .json({ message: "Obtendo todos os usuários", users: results });
       });
     } catch (error) {
-      console.error("Erro ao executar a consulta:", error);
+      console.log("Erro ao executar a consulta:", error);
       return res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
@@ -64,7 +68,7 @@ module.exports = class userController {
     try {
       connect.query(query, values, function (err, results) {
         if (err) {
-          console.error(err);
+          console.log(err);
           return res.status(500).json({ error: "Erro interno do servidor" });
         }
 
@@ -78,7 +82,7 @@ module.exports = class userController {
         });
       });
     } catch (error) {
-      console.error("Erro ao executar a consulta:", error);
+      console.log("Erro ao executar a consulta:", error);
       return res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
@@ -105,27 +109,34 @@ module.exports = class userController {
       if (cpfError) {
         return res.status(400).json(cpfError);
       }
+
+      const hashedPassword = await bcrypt.hash(senha, SALT_ROUNDS);
+
       const query =
         "UPDATE usuario SET cpf = ?, email = ?, senha = ?, nome = ?  WHERE id_usuario = ?";
-      connect.query(query, [cpf, email, senha, nome, id], (err, results) => {
-        if (err) {
-          if (err.code === "ER_DUP_ENTRY") {
-            if (err.message.includes("email")) {
-              return res.status(400).json({ error: "Email já cadastrado" });
+      connect.query(
+        query,
+        [cpf, email, hashedPassword, nome, id],
+        (err, results) => {
+          if (err) {
+            if (err.code === "ER_DUP_ENTRY") {
+              if (err.message.includes("email")) {
+                return res.status(400).json({ error: "Email já cadastrado" });
+              }
+            } else {
+              return res
+                .status(500)
+                .json({ error: "Erro interno do servidor", err });
             }
-          } else {
-            return res
-              .status(500)
-              .json({ error: "Erro interno do servidor", err });
           }
+          if (results.affectedRows === 0) {
+            return res.status(404).json({ error: "Usuário não encontrado" });
+          }
+          return res
+            .status(200)
+            .json({ message: "Usuário atualizado com sucesso" });
         }
-        if (results.affectedRows === 0) {
-          return res.status(404).json({ error: "Usuário não encontrado" });
-        }
-        return res
-          .status(200)
-          .json({ message: "Usuário atualizado com sucesso" });
-      });
+      );
     } catch (error) {
       return res.status(500).json({ error });
     }
@@ -147,7 +158,7 @@ module.exports = class userController {
     try {
       connect.query(query, values, function (err, results) {
         if (err) {
-          console.error(err);
+          console.log(err);
           return res.status(500).json({ error: "Erro interno do servidor" });
         }
 
@@ -160,7 +171,7 @@ module.exports = class userController {
           .json({ message: "Usuário excluído com ID: " + userId });
       });
     } catch (error) {
-      console.error("Erro ao executar a consulta:", error);
+      console.log("Erro ao executar a consulta:", error);
       return res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
@@ -173,53 +184,43 @@ module.exports = class userController {
       return res.status(400).json({ error: "Email e senha são obrigatórios" });
     }
 
-    // Usando uma function SQL para validar login
-    const query = `SELECT fn_validar_login(?, ?) AS usuario_id`;
+    const query = `SELECT * FROM usuario WHERE email = ?`;
 
     try {
-      connect.query(query, [email, senha], (err, results) => {
+      connect.query(query, [email], (err, results) => {
         if (err) {
-          console.error("Erro ao executar a consulta:", err);
+          console.log("Erro ao executar a consulta:", err);
           return res.status(500).json({ error: "Erro interno do servidor" });
         }
 
-        const usuarioId = results[0].usuario_id;
-
-        if (usuarioId <= 0) {
-          return res.status(401).json({ error: "Credenciais inválidas" });
+        if (results.length === 0) {
+          return res.status(401).json({ error: "Usuário não encontrado" });
         }
 
-        // Define a query SQL para obter os dados do usuário a partir do ID
-        const getUserQuery = `SELECT id_usuario, nome, email, cpf FROM usuario WHERE id_usuario = ?`;
+        const user = results[0];
 
-        // Executa a query no banco de dados, passando o ID do usuário como parâmetro
-        connect.query(getUserQuery, [usuarioId], (err, userResults) => {
-          // Se ocorrer um erro durante a execução da consulta, retorna erro 500 (erro interno do servidor)
-          if (err) {
-            return res
-              .status(500)
-              .json({ error: "Erro ao obter dados do usuário" });
-          }
+        // Comparar a senha enviada na requisição com o hash do banco
+        const passwordOK = bcrypt.compareSync(senha, user.senha);
 
-          // Armazena o primeiro resultado da consulta (usuário encontrado)
-          const user = userResults[0];
+        if (!passwordOK) {
+          return res.status(401).json({ error: "Senha incorreta" });
+        }
 
-          // Gera um token JWT assinado com o ID do usuário, usando a chave secreta (process.env.SECRET)
-          // O token terá validade de 1 hora
-          const token = jwt.sign({ id: user.id_usuario }, process.env.SECRET, {
-            expiresIn: "1h",
-          });
+        const token = jwt.sign({ id: user.id_usuario }, process.env.SECRET, {
+          expiresIn: "1h",
+        });
 
-          // Retorna resposta de sucesso com os dados do usuário e o token JWT gerado
-          return res.status(200).json({
-            message: "Login bem-sucedido", // Mensagem de sucesso
-            user, // Objeto com dados do usuário (id, nome, email, cpf)
-            token, // Token JWT que poderá ser usado para autenticação nas próximas requisições
-          });
+        delete user.senha;
+
+        // Retorna resposta de sucesso com os dados do usuário e o token JWT gerado
+        return res.status(200).json({
+          message: "Login bem-sucedido",
+          user,
+          token, 
         });
       });
     } catch (error) {
-      console.error("Erro ao executar a consulta:", error);
+      console.log("Erro ao executar a consulta:", error);
       return res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
