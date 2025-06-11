@@ -200,7 +200,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,'João','@5','11111111113','$2b$10$cUCNfB8zeLxEfopVSyBtIOhmUR6vtZrvIMShv.VNHqKWmiE1.AaoK'),(3,'gaby','@2','11111111112','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i'),(4,'jaoo','j@','12345678910','$2b$10$NEqMYlxOjyK4694Q2hlsOeiqYwqldURk1QH/cPQI8.eBAQV.f7uIi'),(8,'jao','jo@','11111111114','$2b$10$Q1YRcIXGtcYHXlgLvqnsIeigMyVseyo1TnOugu1rbF0YaTjdGSMJW');
+INSERT INTO `usuario` VALUES (1,'João','@5','11111111111','$2b$10$cUCNfB8zeLxEfopVSyBtIOhmUR6vtZrvIMShv.VNHqKWmiE1.AaoK'),(3,'gaby','@2','11111111113','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i'),(4,'jaoo','j@','11111111114','$2b$10$NEqMYlxOjyK4694Q2hlsOeiqYwqldURk1QH/cPQI8.eBAQV.f7uIi'),(5,'Kauanny','kauanny@email.com','11111111115','$2b$10$cUCNfB8zeLxEfopVSyBtIOhmUR6vtZrvIMShv.VNHqKWmiE1.AaoK'),(6,'Gabriela','gabriela@email.com','11111111116','$2b$10$W/LiZf4OB/qOWI4nMkG89.ZZ6jFPs8uL1aUxLlulcsiwAqpVI2q.i'),(7,'João Otávio','joao@email.com','11111111117','$2b$10$NEqMYlxOjyK4694Q2hlsOeiqYwqldURk1QH/cPQI8.eBAQV.f7uIi'),(8,'jao','jo@','11111111118','$2b$10$Q1YRcIXGtcYHXlgLvqnsIeigMyVseyo1TnOugu1rbF0YaTjdGSMJW');
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -444,4 +444,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-11  9:23:27
+-- Dump completed on 2025-06-11 10:51:15
