@@ -47,17 +47,16 @@ end;//
 delimiter ;
 
 
-select * from logExclusaoReserva;
+select * from logexclusaoreserva;
 
 
 create table if not exists logexclusaousuario (
-  id_log int not null auto_increment,
+  id_log int auto_increment primary key,
   id_usuario int,
   nome varchar(50),
   email varchar(50),
   cpf varchar(50),
-  data_exclusao datetime,
-  primary key(id_log)
+  data_exclusao datetime
 );
 
 
@@ -84,3 +83,5 @@ begin
 end $$
 
 delimiter ;
+
+select * from logexclusaousuario;
